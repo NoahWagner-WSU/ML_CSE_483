@@ -27,7 +27,7 @@ def smooth_cond_prob(feature, c_type):
 def naive_bayes(c_type, instance):
 	log_sum = 0
 	for feature in range(1, len(instance) - 1):
-		log_sum += math.log(smooth_cond_prob([feature, instance.iloc[feature]], c_type), 2)
+		log_sum += math.log(smooth_cond_prob([feature, instance[feature]], c_type), 2)
 	log_sum += math.log((train["class_type"] == c_type).sum() / len(train.columns), 2)
 	return 2**log_sum
 
@@ -45,4 +45,4 @@ def predict(instance):
 
 # def test():
 
-print(class_types)
+print(data.iloc[:, 0])
