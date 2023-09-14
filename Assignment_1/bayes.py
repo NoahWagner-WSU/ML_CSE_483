@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import math
+import sys
 
 data = pd.read_csv("zoo.csv")
 train = data.sample(frac = 0.7)
@@ -9,7 +10,7 @@ test = data.drop(train.index)
 class_types = data["class_type"].unique()
 
 # laplace smoothing variables
-a = 1
+a = 0.01
 D = 7
 
 # gets the conditional probability of a feature given a class
@@ -37,12 +38,30 @@ def predict(instance):
 	nb_total = 0
 	for c_type in class_types:
 		nb_results.append(naive_bayes(c_type, instance))
-	nb_total = nb_results.sum()
+	nb_total = sum(nb_results)
 
 	prediction = nb_results.index(max(nb_results))
 
 	return [class_types[prediction], nb_results[prediction] / nb_total]
 
-# def test():
+def main():
+	predictions = []
+	probabilities = []
+	correct = []
+	classes = test["class_type"]
+	for row in range(0, len(test.index)):
+		prediction = predict(test.iloc[row])
+		predictions.append(prediction[0])
+		probabilities.append(prediction[1])
+		is_correct = (classes.iloc[row] == prediction[0])
+		if is_correct:
+			correct.append("CORRECT")
+		else:
+			correct.append("WRONG")
+	test["predicted"] = predictions
+	test["probability"] = probabilities
+	test["correct?"] = correct
 
-print(data.iloc[:, 0])
+main()
+
+test.to_csv(sys.stdout, sep=',', index=False)
