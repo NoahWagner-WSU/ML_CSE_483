@@ -10,7 +10,7 @@ test = data.drop(train.index)
 class_types = data["class_type"].unique()
 
 # laplace smoothing variables
-a = 0.01
+a = 0.1
 D = 7
 
 # gets the conditional probability of a feature given a class
@@ -25,11 +25,13 @@ def smooth_cond_prob(feature, c_type):
 # do log thing
 # multiplies the conditional probabilities for all features given the class
 # c_type is the class type, and instance is a pandas series of an instance (only features are used)
+# I'm not sure if I have to multiply additional p(leg not = 0 | c) * p(leg not = 1 | c) ... p(leg = 4 | c) ... p(leg not = 6 | c)
 def naive_bayes(c_type, instance):
-	log_sum = 0
+	num = (train["class_type"] == c_type).sum() + a
+	den = len(train.columns) + a * D
+	log_sum = math.log(num / den, 2)
 	for feature in range(1, len(instance) - 1):
 		log_sum += math.log(smooth_cond_prob([feature, instance[feature]], c_type), 2)
-	log_sum += math.log((train["class_type"] == c_type).sum() / len(train.columns), 2)
 	return 2**log_sum
 
 # return class type and soft-max probability in an array or dictionary idk
