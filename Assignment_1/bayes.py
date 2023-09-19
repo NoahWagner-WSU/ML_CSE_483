@@ -3,14 +3,16 @@ import pandas as pd
 import math
 import sys
 
+#load and seperate data
 data = pd.read_csv("zoo.csv")
 train = data.sample(frac = 0.7)
 test = data.drop(train.index)
 
+# all possible class types
 class_types = data["class_type"].unique()
 
 # laplace smoothing variables
-a = 0.1
+a = 0.01
 D = 7
 
 # gets the conditional probability of a feature given a class
@@ -22,10 +24,8 @@ def smooth_cond_prob(feature, c_type):
 	den = (train["class_type"] == c_type).sum() + a * D
 	return num / den
 
-# do log thing
 # multiplies the conditional probabilities for all features given the class
 # c_type is the class type, and instance is a pandas series of an instance (only features are used)
-# I'm not sure if I have to multiply additional p(leg not = 0 | c) * p(leg not = 1 | c) ... p(leg = 4 | c) ... p(leg not = 6 | c)
 def naive_bayes(c_type, instance):
 	num = (train["class_type"] == c_type).sum() + a
 	den = len(train.columns) + a * D
@@ -34,7 +34,8 @@ def naive_bayes(c_type, instance):
 		log_sum += math.log(smooth_cond_prob([feature, instance[feature]], c_type), 2)
 	return 2**log_sum
 
-# return class type and soft-max probability in an array or dictionary idk
+# predicts the class from a set of features
+# returns [predicted class type, confidence probability]
 def predict(instance):
 	nb_results = []
 	nb_total = 0
@@ -46,6 +47,8 @@ def predict(instance):
 
 	return [class_types[prediction], nb_results[prediction] / nb_total]
 
+# predicts the class for every row in the test dataset
+# adds results to the end of the test dataset
 def main():
 	predictions = []
 	probabilities = []
@@ -66,4 +69,5 @@ def main():
 
 main()
 
+#output results to stdout in csv format
 test.to_csv(sys.stdout, sep=',', index=False)
