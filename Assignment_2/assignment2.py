@@ -18,6 +18,16 @@ class SelectColumns(BaseEstimator, TransformerMixin):
 	def transform(self, xs):
 		return xs[self.columns].fillna(0)
 
+class TransformColumns(BaseEstimator, TransformerMixin):
+	def __init__(self, func):
+		self.func = func
+	# don't need to do anything
+	def fit(self, xs, ys, **params):
+		return self
+	# actually perform the selection
+	def transform(self, xs):
+		return xs.apply(self.func)
+
 # class ExpandColumns(BaseEstimator, TransformerMixin):
 # 	def __init__(self, columns):
 # 		self.columns = columns
@@ -33,12 +43,33 @@ grid = {
 	# 	["Kitchen Qual", "Neighborhood"]
 	# ],
 	"column_select__columns": [
-		["Overall Qual"],
-		["Overall Qual", "TotRms AbvGrd"],
-		["Overall Qual", "TotRms AbvGrd", "Full Bath", "Garage Cars"],
-		["Full Bath", "Garage Cars", "TotRms AbvGrd", "Fireplaces", "Year Built", "Overall Qual"],
-		["Full Bath", "Garage Cars", "TotRms AbvGrd", "Fireplaces", "Year Built", "Overall Qual", "Kitchen Qual_Ex", "Kitchen Qual_Gd"],
-		["Full Bath", "Garage Cars", "TotRms AbvGrd", "Fireplaces", "Year Built", "Overall Qual", "Kitchen Qual_Ex", "Kitchen Qual_Gd", "Neighborhood_NridgHt"]
+		[
+			"Full Bath", 
+			"Garage Cars", 
+			"TotRms AbvGrd", 
+			"Fireplaces", 
+			"Overall Qual", 
+			"Kitchen Qual_Ex", 
+			"Kitchen Qual_Gd", 
+			"Neighborhood_NridgHt", 
+			"Garage Type_Attchd",
+			"BsmtFin Type 1_GLQ",
+			"Wood Deck SF",
+			"Mas Vnr Area",
+			"Screen Porch",
+			"MS SubClass",
+			"Lot Area",
+			"Year Remod/Add",
+			"Exter Qual_TA",
+			"Bsmt Exposure_Gd"
+		],
+	],
+	"column_transform__func": [
+		lambda y: y,
+		np.sqrt,
+		np.square,
+		np.cbrt,
+		lambda y: np.power(y, 3),
 	],
 	"linear_regression": [
 		LinearRegression(n_jobs = -1), # no transformation
@@ -54,20 +85,13 @@ grid = {
 			LinearRegression(n_jobs = -1),
 			func = np.log,
 			inverse_func = np.exp),
-		TransformedTargetRegressor(
-			LinearRegression(n_jobs = -1),
-			func = lambda y: np.power(y, 1/1.5),
-			inverse_func = lambda y: np.power(y, 1.5)),
-		TransformedTargetRegressor(
-			LinearRegression(n_jobs = -1),
-			func = lambda y: np.power(y, 1/2.5),
-			inverse_func = lambda y: np.power(y, 2.5))
 	]
 }
 
 steps = [
 	# ("column_expand", ExpandColumns([])),
 	("column_select", SelectColumns([])),
+	("column_transform", TransformColumns(None)),
 	("linear_regression", None),
 ]
 
@@ -78,7 +102,7 @@ search = GridSearchCV(pipe, grid, scoring = 'r2', n_jobs = -1)
 data = pd.read_csv("AmesHousing.csv")
 
 xs = data.drop(columns = ["SalePrice"])
-xs = xs.join(pd.get_dummies(xs[["Kitchen Qual", "Neighborhood"]], dtype=float))
+xs = pd.get_dummies(xs, dtype=float)
 ys = data["SalePrice"]
 train_x, test_x, train_y, test_y = train_test_split(xs, ys, train_size = 0.7)
 
