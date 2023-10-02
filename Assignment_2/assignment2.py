@@ -24,24 +24,11 @@ class TransformColumns(BaseEstimator, TransformerMixin):
 	# don't need to do anything
 	def fit(self, xs, ys, **params):
 		return self
-	# actually perform the selection
+	# actually perform the transformation
 	def transform(self, xs):
 		return xs.apply(self.func)
 
-# class ExpandColumns(BaseEstimator, TransformerMixin):
-# 	def __init__(self, columns):
-# 		self.columns = columns
-# 	# don't need to do anything
-# 	def fit(self, xs, ys, **params):
-# 		return self
-# 	# actually perform the selection
-# 	def transform(self, xs):
-# 		return xs.join(pd.get_dummies(xs[self.columns], dtype=float))
-
 grid = {
-	# "column_expand__columns" : [
-	# 	["Kitchen Qual", "Neighborhood"]
-	# ],
 	"column_select__columns": [
 		[
 			"Full Bath", 
@@ -52,6 +39,9 @@ grid = {
 			"Kitchen Qual_Ex", 
 			"Kitchen Qual_Gd", 
 			"Neighborhood_NridgHt", 
+			"Neighborhood_NoRidge",
+			"Neighborhood_StoneBr",
+			"Neighborhood_OldTown",
 			"Garage Type_Attchd",
 			"BsmtFin Type 1_GLQ",
 			"Wood Deck SF",
@@ -61,7 +51,7 @@ grid = {
 			"Lot Area",
 			"Year Remod/Add",
 			"Exter Qual_TA",
-			"Bsmt Exposure_Gd"
+			"Bsmt Exposure_Gd",
 		],
 	],
 	"column_transform__func": [
@@ -89,7 +79,6 @@ grid = {
 }
 
 steps = [
-	# ("column_expand", ExpandColumns([])),
 	("column_select", SelectColumns([])),
 	("column_transform", TransformColumns(None)),
 	("linear_regression", None),
@@ -104,7 +93,6 @@ data = pd.read_csv("AmesHousing.csv")
 xs = data.drop(columns = ["SalePrice"])
 xs = pd.get_dummies(xs, dtype=float)
 ys = data["SalePrice"]
-train_x, test_x, train_y, test_y = train_test_split(xs, ys, train_size = 0.7)
 
 search.fit(xs, ys)
 
