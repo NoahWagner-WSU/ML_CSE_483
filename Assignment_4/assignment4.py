@@ -54,8 +54,8 @@ def cluster(pok_type):
 	result = {}
 	result["scores"] = []
 	result["best"] = 1
+	result["best score"] = -1
 	result["best_cluster"] = []
-	best_score = -1
 
 	max_range = range(2, min(cluster_range.stop, len(pokemon.index)))
 	for n in max_range:
@@ -64,25 +64,56 @@ def cluster(pok_type):
 		labels = pipeline.predict(pokemon)
 		score = silhouette_score(pipeline.named_steps["store_data"].data, labels)
 		result["scores"].append(score)
-		if(score > best_score):
-			best_score = score
+		if(score > result["best score"]):
+			result["best score"] = score
 			result["best"] = n
 			result["best_cluster"] = labels
 	return result
+
+# prints the clusters silhouette_scores in the specific output format
+def print_cluster_scores(pok_type, result):
+	print(pok_type)
+	print("-----------")
+	i = 0
+	max_range = range(2, min(cluster_range.stop, len(type_instances[pok_type].index)))
+	for n in max_range:
+		print(str(n) + " clusters: " + str(result["scores"][i]))
+		i = i + 1
+
+	print("best number of clusters: " + str(result["best"]))
+	print("best score: " + str(result["best score"]))
+	print("")
+
+
+# converts the pipeline output for a pokimon type into a dataframe for each cluster, then prints each dataframe
+def print_cluster(pok_type, result):
+	pok_info = type_instances[pok_type][["Name", "HP", "Attack", "Defense", "Sp. Atk", "Sp. Def", "Speed"]]
+
+	print(pok_type)
+	print("-----")
+	for n in np.unique(result["best_cluster"]):
+		print("Cluster " + str(n))
+		pok_in_cluster = pok_info[result["best_cluster"] == n]
+		print(pok_in_cluster)
+
+		print("Mean HP: " + str(pok_in_cluster["HP"].mean()))
+		print("Mean Attack: " + str(pok_in_cluster["Attack"].mean()))
+		print("Mean Defense: " + str(pok_in_cluster["Defense"].mean()))
+		print("Mean Sp. Atk: " + str(pok_in_cluster["Sp. Atk"].mean()))
+		print("Mean Sp. Def: " + str(pok_in_cluster["Sp. Def"].mean()))
+		print("Mean Speed: " + str(pok_in_cluster["Speed"].mean()))
+		
+		print("")
+
+	print("")
 
 def main():
 	type_results = {}
 	for pok_type in types:
 		type_results[pok_type] = cluster(pok_type)
-		# print_cluster_scores(pok_type, type_results[pok_type].scores)
+		print_cluster_scores(pok_type, type_results[pok_type])
 
-	print(type_results)
-	# print the clusters
-
+	# print the best clusters
+	for pok_type in type_results:
+		print_cluster(pok_type, type_results[pok_type])
 main()
-
-# converts the pipeline output for a pokimon type into a dataframe for each cluster, then prints each dataframe
-# print_cluster(type)
-
-# prints the clusters silhouette_scores in the specific output format
-# def print_cluster_scores(type, silhouette_scores):
