@@ -85,7 +85,7 @@ def print_cluster_scores(pok_type, result):
 	print("")
 
 
-# converts the pipeline output for a pokimon type into a dataframe for each cluster, then prints each dataframe
+# converts the pipeline output for a pokemon type into a dataframe for each cluster, then prints each dataframe
 def print_cluster(pok_type, result):
 	pok_info = type_instances[pok_type][["Name", "HP", "Attack", "Defense", "Sp. Atk", "Sp. Def", "Speed"]]
 
@@ -102,7 +102,7 @@ def print_cluster(pok_type, result):
 		print("Mean Sp. Atk: " + str(pok_in_cluster["Sp. Atk"].mean()))
 		print("Mean Sp. Def: " + str(pok_in_cluster["Sp. Def"].mean()))
 		print("Mean Speed: " + str(pok_in_cluster["Speed"].mean()))
-		
+
 		print("")
 
 	print("")
