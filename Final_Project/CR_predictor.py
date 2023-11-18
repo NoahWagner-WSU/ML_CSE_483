@@ -43,10 +43,16 @@ features = [
 	"loser.elixir.average",
 ]
 
+# consider only loading the winner.cards.list and loser.cards.list instead of the individual cards
+# possibly account for gamemode, we only want to load normal games
+
+# write a function to confirm if there are duplicate cards just to double check
+
 data = pd.read_csv("BattlesStaging_01012021_WL_tagged.csv", usecols=features, nrows=instance_count)
 
 data["blue_wins"] = 1
 
+# doesn't work lol
 def swap_halves(row):
 	if(random.random() > 0.5):
 		mid = len(row) // 2
