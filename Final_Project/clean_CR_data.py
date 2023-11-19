@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import random
 
-instance_count = 1000
+instance_count = 100000
 
 features = [
 	"winner.card1.id",
@@ -43,19 +43,14 @@ features = [
 	"loser.elixir.average",
 ]
 
-# consider only loading the winner.cards.list and loser.cards.list instead of the individual cards
-# possibly account for gamemode, we only want to load normal games
-
-# write a function to confirm if there are duplicate cards just to double check
-
-data = pd.read_csv("BattlesStaging_01012021_WL_tagged.csv", usecols=features, nrows=instance_count)
+data = pd.read_csv("BattlesStaging_01012021_WL_tagged.csv", usecols=features)
 
 data["blue_wins"] = 1
 
-# doesn't work lol
 def swap_halves(row):
-	if(random.random() > 0.5):
+	if random.random() > 0.5:
 		mid = len(row) // 2
+
 		row[-1] = 0
 		swapped = np.concatenate([row[mid:-1], row[:mid]])
 		swapped = np.append(swapped, row[-1])
@@ -66,11 +61,9 @@ def swap_halves(row):
 data = data.apply(swap_halves, axis=1)
 
 # convert features to every "winner" replaced with "blue", and "loser" with "red"
-for i in range(0, len(features)):
-	features[i] = features[i].replace("winner", "blue")
-	features[i] = features[i].replace("loser", "red")
+for i in range(len(features)):
+	features[i] = features[i].replace("winner", "blue").replace("loser", "red")
 
-data.columns = features
+data.columns = features + ["blue_wins"]  # Add the last column back
 
-data.to_csv('og.csv', index=False)
-randomized_data.to_csv('swapped.csv', index=False)
+data.to_csv('cleaned_CR_data.csv', index=False)
