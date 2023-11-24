@@ -1,24 +1,23 @@
 import pandas as pd
 import numpy as np
+import pickle
 
 from sklearn.pipeline import Pipeline
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 
 #TODO: 
-# try gradient boosting
-# figure out how to pickle trained models
-# possibly take into account trophy count / gamemode
+# ignore all gamemodes except 72000201
+# possibly take into account trophy count
 # add one more step to pipeline to meet requirements
 # have user be able to input decks, and our model predict who will win
 
-instance_count = 10000
+instance_count = 100000
 
-data = pd.read_csv("cleaned_CR_data.csv", nrows = instance_count)
+data = pd.read_csv("data/cleaned_CR_data_Jan1.csv", nrows = instance_count)
 
 xs = data.drop(columns = ["blue_wins"])
 ys = data["blue_wins"]
@@ -87,10 +86,31 @@ grid_rand_forest = {
 	"predictor__max_features": ["sqrt", 12, 13, 14, 15, 16],
 }
 
+grid_grad_boost = {
+	"predictor": [
+		GradientBoostingClassifier()
+	],
+	"predictor__max_depth": [11, 12, 13, 14],
+	"predictor__max_features": [5, 6, 7, 8, 9],
+	"predictor__learning_rate": [0.025, 0.05, 0.075],
+}
+
 search_rand_forest = GridSearchCV(pipe, grid_rand_forest, scoring = "accuracy", n_jobs=-1)
 
-search_rand_forest.fit(xs, ys)
+search_grad_boost = GridSearchCV(pipe, grid_grad_boost, scoring = "accuracy", n_jobs=-1)
 
-print("Random Forest:")
-print("Accuracy:", search_rand_forest.best_score_)
-print("Best params:", search_rand_forest.best_params_)
+# search_rand_forest.fit(xs, ys)
+
+# print("Random Forest:")
+# print("Accuracy:", search_rand_forest.best_score_)
+# print("Best params:", search_rand_forest.best_params_)
+
+search_grad_boost.fit(xs, ys)
+
+print("Gradient Boosting:")
+print("Accuracy:", search_grad_boost.best_score_)
+print("Best params:", search_grad_boost.best_params_)
+
+# save the model
+with open("grad_boost.pkl", "wb") as f:
+	pickle.dump(search_grad_boost.best_estimator_, f)

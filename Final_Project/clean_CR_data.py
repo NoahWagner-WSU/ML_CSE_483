@@ -43,7 +43,7 @@ features = [
 	"loser.elixir.average",
 ]
 
-data = pd.read_csv("BattlesStaging_01012021_WL_tagged.csv", usecols=features)
+data = pd.read_csv("data/BattlesStaging_01022021_WL_tagged.csv", usecols=features)
 
 data["blue_wins"] = 1
 
@@ -66,4 +66,4 @@ for i in range(len(features)):
 
 data.columns = features + ["blue_wins"]  # Add the last column back
 
-data.to_csv('cleaned_CR_data.csv', index=False)
+data.to_csv('data/cleaned_CR_data_Jan2.csv', index=False)
