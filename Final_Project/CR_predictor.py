@@ -15,7 +15,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 # add one more step to pipeline to meet requirements
 # have user be able to input decks, and our model predict who will win
 
-instance_count = 100000
+instance_count = 1000000
 
 data = pd.read_csv("data/cleaned_CR_data_Jan1.csv", nrows=instance_count)
 
