@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import random
 
-instance_count = 100000
+instance_count = 10000
 
 features = [
 	"winner.card1.id",
@@ -41,9 +41,16 @@ features = [
 	"loser.card8.level",
 	"loser.totalcard.level",
 	"loser.elixir.average",
+	"gameMode.id"
 ]
 
 data = pd.read_csv("data/BattlesStaging_01022021_WL_tagged.csv", usecols=features)
+
+data = data[data["gameMode.id"] == 72000201]
+
+data = data.drop(columns = ["gameMode.id"])
+
+features.remove("gameMode.id")
 
 data["blue_wins"] = 1
 

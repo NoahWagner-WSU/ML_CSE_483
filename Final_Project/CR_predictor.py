@@ -17,7 +17,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 
 instance_count = 100000
 
-data = pd.read_csv("data/cleaned_CR_data_Jan1.csv", nrows = instance_count)
+data = pd.read_csv("data/cleaned_CR_data_Jan1.csv", nrows=instance_count)
 
 xs = data.drop(columns = ["blue_wins"])
 ys = data["blue_wins"]
@@ -90,8 +90,8 @@ grid_grad_boost = {
 	"predictor": [
 		GradientBoostingClassifier()
 	],
-	"predictor__max_depth": [11, 12, 13, 14],
-	"predictor__max_features": [5, 6, 7, 8, 9],
+	"predictor__max_depth": [12, 13, 14, 15],
+	"predictor__max_features": [7, 8, 9, 10, 11, 12],
 	"predictor__learning_rate": [0.025, 0.05, 0.075],
 }
 
