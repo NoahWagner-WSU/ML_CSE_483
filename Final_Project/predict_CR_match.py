@@ -17,9 +17,7 @@ class SelectColumns(BaseEstimator, TransformerMixin):
 	def transform(self, xs):
 		return xs[self.columns]
 
-data = pd.read_csv("data/cleaned_CR_data_Jan2.csv", nrows=100000)
-xs = data.drop(columns = ["blue_wins"])
-ys = data["blue_wins"]
+xs = pd.read_csv("CR_Matches.csv")
 
 grad_boost = None
 
@@ -28,6 +26,4 @@ with open("grad_boost.pkl", "rb") as f:
 
 pred_y = grad_boost.predict(xs)
 
-accuracy = accuracy_score(ys, pred_y)
-
-print(accuracy)
+print(pred_y)
