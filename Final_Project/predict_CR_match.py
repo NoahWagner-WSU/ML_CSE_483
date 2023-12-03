@@ -6,6 +6,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
 from sklearn.base import TransformerMixin, BaseEstimator
+from sklearn.preprocessing import MinMaxScaler
 
 class SelectColumns(BaseEstimator, TransformerMixin):
 	def __init__(self, columns):

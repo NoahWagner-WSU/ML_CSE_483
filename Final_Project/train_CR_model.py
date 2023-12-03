@@ -10,15 +10,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.preprocessing import MinMaxScaler
 
-#TODO: 
-# ignore all gamemodes except 72000201
-# possibly take into account trophy count
-# add one more step to pipeline to meet requirements
-# have user be able to input decks, and our model predict who will win
+instance_count = 2000000
 
-instance_count = 10000
-
-data = pd.read_csv("data/cleaned_CR_data_Jan1.csv", nrows=instance_count)
+data = pd.read_csv("data/cleaned_CR_data_Jan2.csv", nrows=instance_count)
 
 xs = data.drop(columns = ["blue_wins"])
 ys = data["blue_wins"]
@@ -80,13 +74,13 @@ steps = [
 
 pipe = Pipeline(steps)
 
-grid_rand_forest = {
-	"predictor": [
-		RandomForestClassifier(n_jobs=-1)
-	],
-	"predictor__max_depth": [20, 21, 22, 23],
-	"predictor__max_features": ["sqrt", 12, 13, 14, 15, 16],
-}
+# grid_rand_forest = {
+# 	"predictor": [
+# 		RandomForestClassifier(n_jobs=-1)
+# 	],
+# 	"predictor__max_depth": [4, 5, 6, 7, 8, 9, 10],
+# 	"predictor__max_features": ["sqrt", 12, 13, 14, 15, 16]
+# }
 
 grid_grad_boost = {
 	"predictor": [
@@ -97,7 +91,7 @@ grid_grad_boost = {
 	"predictor__learning_rate": [0.025, 0.05, 0.075],
 }
 
-search_rand_forest = GridSearchCV(pipe, grid_rand_forest, scoring = "accuracy", n_jobs=-1)
+# search_rand_forest = GridSearchCV(pipe, grid_rand_forest, scoring = "accuracy", n_jobs=-1)
 
 search_grad_boost = GridSearchCV(pipe, grid_grad_boost, scoring = "accuracy", n_jobs=-1)
 
@@ -114,5 +108,5 @@ print("Accuracy:", search_grad_boost.best_score_)
 print("Best params:", search_grad_boost.best_params_)
 
 # save the model
-with open("grad_boost.pkl", "wb") as f:
+with open("grad_boost2.pkl", "wb") as f:
 	pickle.dump(search_grad_boost.best_estimator_, f)
